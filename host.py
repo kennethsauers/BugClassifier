@@ -6,16 +6,13 @@ import numpy as np
 app = Flask(__name__)
 
 def preprocessing(imgarr):
-    return np.asarray(imgarr).reshape([-1,28,28,1])
+    return np.asarray(imgarr).reshape([-1,32,32,3])
 
 @app.route("/evaluate", methods = ['POST'])
 def predict():
     # TODO: change archtuture so that model is not loaded on evey predict call
     #this currenly is very slow
-    fashion_mnist = keras.datasets.fashion_mnist
-    (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
     model = tf.keras.models.load_model('model/mymodel.h5')
-
     payload = request.get_json()
     x = model.predict(preprocessing(payload['data']))
     print(x)
