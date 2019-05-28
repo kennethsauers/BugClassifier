@@ -1,3 +1,6 @@
+import requests, json
+
+
 # TensorFlow and tf.keras
 import tensorflow as tf
 from tensorflow import keras
@@ -10,31 +13,21 @@ import subprocess
 
 print(tf.__version__)
 
-def show(idx, title):
-  plt.figure()
-  plt.imshow(test_images[idx].reshape(28,28))
-  plt.axis('off')
-  plt.title('\n\n{}'.format(title), fontdict={'size': 16})
+fashion_mnist = keras.datasets.fashion_mnist
+(train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
 
-import random
-rando = random.randint(0,len(test_images)-1)
-show(rando, 'An Example Image: {}'.format(class_names[test_labels[rando]]))
 
-import json
-data = json.dumps({"signature_name": "serving_default", "instances": test_images[0:3].tolist()})
-print('Data: {} ... {}'.format(data[:50], data[len(data)-52:]))
 
-import requests
-headers = {"content-type": "application/json"}
-json_response = requests.post('http://localhost:8501/v1/models/fashion_model:predict', data=data, headers=headers)
-predictions = json.loads(json_response.text)['predictions']
+def main():
+    url = "http://127.0.0.1:5000/evaluate"
+    data = test_images[4].reshape([28*28])
+    data = data.tolist()
+    body  ={'data' : data}
+    headers = {'content-type': 'application/json'}
 
-show(0, 'The model thought this was a {} (class {}), and it was actually a {} (class {})'.format(
-  class_names[np.argmax(predictions[0])], test_labels[0], class_names[np.argmax(predictions[0])], test_labels[0]))
-headers = {"content-type": "application/json"}
-json_response = requests.post('http://localhost:8501/v1/models/fashion_model/versions/1:predict', data=data, headers=headers)
-predictions = json.loads(json_response.text)['predictions']
+    r = requests.post(url, data=json.dumps(body), headers=headers)
+    print(r.text)
 
-for i in range(0,3):
-  show(i, 'The model thought this was a {} (class {}), and it was actually a {} (class {})'.format(
-    class_names[np.argmax(predictions[i])], np.argmax(predictions[i]), class_names[test_labels[i]], test_labels[i]))
+
+if __name__ == "__main__":
+    main()
