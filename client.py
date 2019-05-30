@@ -30,7 +30,7 @@ fashion_mnist = keras.datasets.cifar100
 (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
 
 def main():
-    url = "http://127.0.0.1:5000/evaluate"
+    url = "http://192.168.0.252:5000/evaluate"
     data = test_images[4].reshape([32*32*3])
     data = data.tolist()
     body  ={'data' : data}
